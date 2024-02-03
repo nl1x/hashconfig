@@ -17,27 +17,42 @@ public class ConfigManager
     private final String filepath;
 
 
-    public ConfigManager(String filepath) throws IOException, InvalidConfigurationException
+    /**
+     * @param filepath The path of the configuration file to load. !! WARNING !! The file must be present in the package (PluginName.jar).
+     * @throws IOException If the plugin can't read the file
+     * @throws InvalidConfigurationException If the configuration is invalid
+     */
+    public ConfigManager(String filepath, boolean withDotEnv) throws IOException, InvalidConfigurationException
     {
         ConfigManager.instance = this;
         this.filepath = filepath;
-        this.load();
+        this.load(withDotEnv);
     }
 
 
-    public void load() throws IOException, InvalidConfigurationException
+    private void load(boolean withDotEnv) throws IOException, InvalidConfigurationException
     {
         this.createFileIfNotExists();
-        this.env = Dotenv.load();
         this.yaml = new YamlConfiguration();
         this.yaml.load(this.filepath);
+        if (withDotEnv)
+            this.env = Dotenv.load();
+        else
+            this.env = null;
     }
 
+    /**
+     * @throws IOException If the file configuration failed to load.
+     * @throws InvalidConfigurationException If the new configuration file has an incorrect format.
+     */
     public void reload() throws IOException, InvalidConfigurationException
     {
-        this.load();
+        this.load(this.env != null);
     }
 
+    /**
+     * @throws IOException If the configuration has failed to save.
+     */
     public void saveConfig() throws IOException
     {
         this.yaml.save(this.filepath);
@@ -45,7 +60,7 @@ public class ConfigManager
 
     private void createFileIfNotExists() throws IOException
     {
-        File configFile = new File("config.yml");
+        File configFile = new File(this.filepath);
         InputStream stream = null;
 
         if (configFile.exists()) return;
@@ -80,16 +95,27 @@ public class ConfigManager
     }
 
 
+    /**
+     * @return The last instance created. !! WARNING !! If you create multiple instance of
+     *           ConfigManager, then it returns only the last instance created.
+     */
     public static ConfigManager getInstance()
     {
         return instance;
     }
 
+    /**
+     * @return The last instance YAML configuration. !! WARNING !! If you create multiple instance
+     *           of ConfigManager, then it returns only the last instance YAML configuration.
+     */
     public static YamlConfiguration getYaml()
     {
         return instance.yaml;
     }
 
+    /**
+     * @return The last instance Dotenv.
+     */
     public static Dotenv getEnv()
     {
         return instance.env;
