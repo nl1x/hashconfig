@@ -73,9 +73,9 @@ public class ConfigManager
 
         stream = getClass().getResourceAsStream("/" + this.filepath);
         if (stream == null)
-            throw new IOException("The default '"
+            throw new IOException("The default file '"
                                   + this.filepath
-                                  + "' file has not been found.");
+                                  + "' cannot not be found.");
 
         writeStreamToFile(stream, configFile);
 
@@ -108,7 +108,7 @@ public class ConfigManager
     public static ConfigManager getInstance() throws InstanceNotFoundException
     {
         if (instance == null)
-            throw new InstanceNotFoundException();
+            throw new InstanceNotFoundException("The instance cannot be found.");
         return instance;
     }
 
@@ -120,7 +120,7 @@ public class ConfigManager
     public static YamlConfiguration getYaml() throws InstanceNotFoundException
     {
         if (instance == null)
-            throw new InstanceNotFoundException();
+            throw new InstanceNotFoundException("The instance cannot be found.");
         return instance.yaml;
     }
 
@@ -131,7 +131,7 @@ public class ConfigManager
     public static Dotenv getEnv() throws InstanceNotFoundException
     {
         if (instance == null)
-            throw new InstanceNotFoundException();
+            throw new InstanceNotFoundException("The instance cannot be found.");
         return instance.env;
     }
 
