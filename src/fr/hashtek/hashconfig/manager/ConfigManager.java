@@ -1,5 +1,6 @@
 package fr.hashtek.hashconfig.manager;
 
+import fr.hashtek.hashconfig.exception.InstanceNotFoundException;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.bspfsystems.yamlconfiguration.configuration.InvalidConfigurationException;
 import org.bspfsystems.yamlconfiguration.file.YamlConfiguration;
@@ -10,15 +11,15 @@ import java.io.*;
 public class ConfigManager
 {
 
-    private static ConfigManager instance;
+    private static ConfigManager instance = null;
 
-    private Dotenv env;
+    private Dotenv env = null;
     private YamlConfiguration yaml;
     private final String filepath;
 
 
     /**
-     * @param filepath The path of the configuration file to load. !! WARNING !! The file must be present in the package (PluginName.jar).
+     * @param filepath The ABSOLUTE path of the configuration file to load. !! WARNING !! The file must be present in the package (PluginName.jar).
      * @throws IOException If the plugin can't read the file
      * @throws InvalidConfigurationException If the configuration is invalid
      */
@@ -66,11 +67,15 @@ public class ConfigManager
         if (configFile.exists()) return;
 
         if (!configFile.createNewFile())
-            throw new IOException("Cannot create the default configuration file.");
+            throw new IOException("Cannot create the default configuration file '"
+                                  + configFile.getName()
+                                  + "'.");
 
         stream = getClass().getResourceAsStream("/" + this.filepath);
         if (stream == null)
-            throw new IOException("The default 'config.yml' file has not been found.");
+            throw new IOException("The default '"
+                                  + this.filepath
+                                  + "' file has not been found.");
 
         writeStreamToFile(stream, configFile);
 
@@ -96,28 +101,37 @@ public class ConfigManager
 
 
     /**
+     * @throws InstanceNotFoundException If there is no instance available.
      * @return The last instance created. !! WARNING !! If you create multiple instance of
      *           ConfigManager, then it returns only the last instance created.
      */
-    public static ConfigManager getInstance()
+    public static ConfigManager getInstance() throws InstanceNotFoundException
     {
+        if (instance == null)
+            throw new InstanceNotFoundException();
         return instance;
     }
 
     /**
+     * @throws InstanceNotFoundException If there is no instance available.
      * @return The last instance YAML configuration. !! WARNING !! If you create multiple instance
      *           of ConfigManager, then it returns only the last instance YAML configuration.
      */
-    public static YamlConfiguration getYaml()
+    public static YamlConfiguration getYaml() throws InstanceNotFoundException
     {
+        if (instance == null)
+            throw new InstanceNotFoundException();
         return instance.yaml;
     }
 
     /**
+     * @throws InstanceNotFoundException If there is no instance available.
      * @return The last instance Dotenv.
      */
-    public static Dotenv getEnv()
+    public static Dotenv getEnv() throws InstanceNotFoundException
     {
+        if (instance == null)
+            throw new InstanceNotFoundException();
         return instance.env;
     }
 
