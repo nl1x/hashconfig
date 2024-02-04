@@ -2,15 +2,16 @@ package fr.hashtek.common.hashconfig.manager;
 
 import fr.hashtek.common.hashconfig.exception.InstanceNotFoundException;
 import io.github.cdimascio.dotenv.Dotenv;
-import org.bukkit.configuration.file.YamlConfiguration;
+import org.simpleyaml.configuration.file.YamlFile;
 
 import java.io.IOException;
 import java.io.File;
-import java.io.InputStream;
 import java.io.FileWriter;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+
 
 public class ConfigManager
 {
@@ -18,19 +19,19 @@ public class ConfigManager
     private static ConfigManager instance = null;
 
     private Dotenv env = null;
-    private YamlConfiguration yaml;
-    private final String inputPath;
+    private YamlFile yaml;
+    private final String resourcePath;
     private final String outputPath;
 
 
     /**
-     * @param inputPath The ABSOLUTE path of the configuration file to load. !! WARNING !! The file must be present in the package (PluginName.jar).
+     * @param resourcePath The ABSOLUTE path of the configuration file to load. !! WARNING !! The file must be present in the package (PluginName.jar).
      * @throws IOException If the plugin can't read the file
      */
-    public ConfigManager(String inputPath, String outputPath, boolean withDotEnv) throws IOException
+    public ConfigManager(String resourcePath, String outputPath, boolean withDotEnv) throws IOException
     {
         ConfigManager.instance = this;
-        this.inputPath = inputPath;
+        this.resourcePath = resourcePath;
         this.outputPath = outputPath;
         this.load(withDotEnv);
     }
@@ -40,7 +41,8 @@ public class ConfigManager
     {
         File configFile = this.createFileIfNotExists();
 
-        this.yaml = YamlConfiguration.loadConfiguration(configFile);
+        this.yaml = new YamlFile(configFile);
+        this.yaml.loadWithComments();
         if (withDotEnv)
             this.env = Dotenv.load();
         else
@@ -48,7 +50,7 @@ public class ConfigManager
     }
 
     /**
-     * @throws IOException If the file configuration failed to load.
+     * @throws IOException If the configuration failed to load.
      */
     public void reload() throws IOException
     {
@@ -58,7 +60,7 @@ public class ConfigManager
     /**
      * @throws IOException If the configuration has failed to save.
      */
-    public void saveConfig() throws IOException
+    public void save() throws IOException
     {
         this.yaml.save(this.outputPath);
     }
@@ -76,10 +78,10 @@ public class ConfigManager
                                   + configFile.getName()
                                   + "'.");
 
-        stream = getClass().getResourceAsStream("/" + this.inputPath);
+        stream = getClass().getResourceAsStream("/" + this.resourcePath);
         if (stream == null)
             throw new IOException("The resource file '"
-                                  + this.inputPath
+                                  + this.resourcePath
                                   + "' cannot not be found in the jar file.");
 
         writeStreamToFile(stream, configFile);
@@ -95,10 +97,14 @@ public class ConfigManager
         BufferedWriter writerBuffer = new BufferedWriter(writer);
         String line = null;
 
-        while ((line = reader.readLine()) != null) {
-            writerBuffer.write(line);
-            writerBuffer.newLine();
-        }
+        do {
+            line = reader.readLine();
+
+            if (line != null) {
+                writerBuffer.write(line);
+                writerBuffer.newLine();
+            }
+        } while (line != null);
 
         writerBuffer.close();
         writer.close();
@@ -123,7 +129,7 @@ public class ConfigManager
      * @return The last instance YAML configuration. !! WARNING !! If you create multiple instance
      *           of ConfigManager, then it returns only the last instance YAML configuration.
      */
-    public static YamlConfiguration getYaml() throws InstanceNotFoundException
+    public static YamlFile getYaml() throws InstanceNotFoundException
     {
         if (instance == null)
             throw new InstanceNotFoundException("The instance cannot be found.");
