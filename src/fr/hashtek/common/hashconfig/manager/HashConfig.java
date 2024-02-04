@@ -13,10 +13,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 
-public class ConfigManager
+public class HashConfig
 {
 
-    private static ConfigManager instance = null;
+    private static HashConfig instance = null;
 
     private Dotenv env = null;
     private YamlFile yaml;
@@ -28,9 +28,9 @@ public class ConfigManager
      * @param resourcePath The ABSOLUTE path of the configuration file to load. !! WARNING !! The file must be present in the package (PluginName.jar).
      * @throws IOException If the plugin can't read the file
      */
-    public ConfigManager(String resourcePath, String outputPath, boolean withDotEnv) throws IOException
+    public HashConfig(String resourcePath, String outputPath, boolean withDotEnv) throws IOException
     {
-        ConfigManager.instance = this;
+        HashConfig.instance = this;
         this.resourcePath = resourcePath;
         this.outputPath = outputPath;
         this.load(withDotEnv);
@@ -117,7 +117,7 @@ public class ConfigManager
      * @return The last instance created. !! WARNING !! If you create multiple instance of
      *           ConfigManager, then it returns only the last instance created.
      */
-    public static ConfigManager getInstance() throws InstanceNotFoundException
+    public static HashConfig getInstance() throws InstanceNotFoundException
     {
         if (instance == null)
             throw new InstanceNotFoundException("The instance cannot be found.");
