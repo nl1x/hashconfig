@@ -37,18 +37,6 @@ public class HashConfig
     }
 
 
-    private void load(boolean withDotEnv) throws IOException
-    {
-        File configFile = this.createFileIfNotExists();
-
-        this.yaml = new YamlFile(configFile);
-        this.yaml.loadWithComments();
-        if (withDotEnv)
-            this.env = Dotenv.load();
-        else
-            this.env = null;
-    }
-
     /**
      * @throws IOException If the configuration failed to load.
      */
@@ -63,6 +51,19 @@ public class HashConfig
     public void save() throws IOException
     {
         this.yaml.save(this.outputPath);
+    }
+
+
+    private void load(boolean withDotEnv) throws IOException
+    {
+        File configFile = this.createFileIfNotExists();
+
+        this.yaml = new YamlFile(configFile);
+        this.yaml.loadWithComments();
+        if (withDotEnv)
+            this.env = Dotenv.load();
+        else
+            this.env = null;
     }
 
     private File createFileIfNotExists() throws IOException
