@@ -1,6 +1,6 @@
-package fr.hashtek.common.hashconfig.manager;
+package fr.hashtek.hashconfig;
 
-import fr.hashtek.common.hashconfig.exception.InstanceNotFoundException;
+import fr.hashtek.hashconfig.exception.InstanceNotFoundException;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.simpleyaml.configuration.file.YamlFile;
 
