@@ -126,26 +126,20 @@ public class HashConfig
     }
 
     /**
-     * @throws InstanceNotFoundException If there is no instance available.
      * @return The last instance YAML configuration. !! WARNING !! If you create multiple instance
      *           of ConfigManager, then it returns only the last instance YAML configuration.
      */
-    public static YamlFile getYaml() throws InstanceNotFoundException
+    public YamlFile getYaml()
     {
-        if (instance == null)
-            throw new InstanceNotFoundException("The instance cannot be found.");
-        return instance.yaml;
+        return this.yaml;
     }
 
     /**
-     * @throws InstanceNotFoundException If there is no instance available.
      * @return The last instance Dotenv.
      */
-    public static Dotenv getEnv() throws InstanceNotFoundException
+    public Dotenv getEnv()
     {
-        if (instance == null)
-            throw new InstanceNotFoundException("The instance cannot be found.");
-        return instance.env;
+        return this.env;
     }
 
 }
