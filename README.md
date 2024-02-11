@@ -9,13 +9,14 @@ Cette librairie est faîte pour manipuler des fichiers de configuration ainsi qu
 
 ### Prototype
 ```java
-HashConfig(String resourcePath, String outputPath, boolean withDotEnv);
+HashConfig(Class<?> plugin, String resourcePath, String outputPath, boolean withDotEnv);
 ```
 
 ### Description
 Classe principale permettant de charger et manipuler un fichier de configuration facilement.
 
 ### Paramètres
+`Class<?> plugin`: La classe principale du plugin.
 `String resourcePath`: Le chemin du fichier de configuration se trouvant dans votre `.jar`. *(Appelé ressource)*
 `String outputPath`: Le chemin vers la sauvegarde locale du fichier de configuration.
 `boolean withDotEnv`: Si il faut charger le fichier d'environnement ou non.
@@ -68,7 +69,8 @@ TOKEN=YOUR_TOKEN
 
 **Modifier / Accéder aux valeurs du fichier de configuration:**
 ```java
-HashConfig config = new HashConfig("configuration_file/config.yml", "plugins/TonPlugin/config.yml", false);
+// `this` doit être l'instance de la classe principale de votre plugin.
+HashConfig config = new HashConfig(this.getClass(), "configuration_file/config.yml", "plugins/TonPlugin/config.yml", false);
 YamlFile yaml = config.getYaml();
 
 String username1 = yaml.getString("users.1.username");
@@ -92,7 +94,9 @@ users:
 
 **Accéder aux variables d'environnement:**
 ```java
-HashConfig config = new HashConfig("...", "...", true);
+HashConfig config = new HashConfig(this.getClass(), "...", "...", true);
+                                                         /*       ^^^^           */
+                                                         /* Pour charger le .env */
 Dotenv env = config.getEnv();
 String token = env.get("TOKEN");
 
@@ -105,7 +109,7 @@ System.out.println("Token: " + token); // Affiche "YOUR_TOKEN"
 
 Si vous avez modifié votre fichier de configuration à la main et que vous souhaitez le recharger sans pour autant devoir restart le serveur, vous pouvez utiliser la méthode suivante :
 ```java
-HashConfig config = new HashConfig(...);
+HashConfig config = new HashConfig(this.getClass(), ...);
 config.reload();
 ```
 

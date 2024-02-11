@@ -18,6 +18,7 @@ public class HashConfig
 
     private static HashConfig instance = null;
 
+    private final Class<?> plugin;
     private Dotenv env = null;
     private YamlFile yaml;
     private final String resourcePath;
@@ -28,9 +29,10 @@ public class HashConfig
      * @param resourcePath The ABSOLUTE path of the configuration file to load. !! WARNING !! The file must be present in the package (PluginName.jar).
      * @throws IOException If the plugin can't read the file
      */
-    public HashConfig(String resourcePath, String outputPath, boolean withDotEnv) throws IOException
+    public HashConfig(Class<?> plugin, String resourcePath, String outputPath, boolean withDotEnv) throws IOException
     {
         HashConfig.instance = this;
+        this.plugin = plugin;
         this.resourcePath = resourcePath;
         this.outputPath = outputPath;
         this.load(withDotEnv);
@@ -79,7 +81,7 @@ public class HashConfig
                                   + configFile.getName()
                                   + "'.");
 
-        stream = getClass().getResourceAsStream("/" + this.resourcePath);
+        stream = this.plugin.getResourceAsStream("/" + this.resourcePath);
         if (stream == null)
             throw new IOException("The resource file '"
                                   + this.resourcePath
@@ -102,6 +104,7 @@ public class HashConfig
             line = reader.readLine();
 
             if (line != null) {
+                System.out.println("Writing line: '" + line + "'.");
                 writerBuffer.write(line);
                 writerBuffer.newLine();
             }
